@@ -30,13 +30,15 @@ type emailConfig struct {
 func newConfigFrom(args []string) (*config, error) {
 	v := viper.New()
 	v.AutomaticEnv()
+	v.RegisterAlias("EsaApiKey", "ESA_API_KEY")
+	v.RegisterAlias("slack.token", "SLACK_TOKEN")
 
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
 	fs.String("query", "", "scan by query")
 	fs.String("config", "", "filename for configuration yaml")
 	pflag.CommandLine.AddGoFlagSet(fs)
 	pflag.Parse()
-	viper.BindPFlags(pflag.CommandLine)
+	v.BindPFlags(pflag.CommandLine)
 
 	v.SetConfigType("yaml")
 	v.AddConfigPath(".")
