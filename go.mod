@@ -3,6 +3,7 @@ module github.com/kanata2/esa-freshness-patroller
 go 1.18
 
 require (
+	github.com/google/go-cmp v0.5.7
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/slack-go/slack v0.10.3
