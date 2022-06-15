@@ -41,7 +41,13 @@ func (n *slackNotifier) Notify(os []*MaybeOutdated) error {
 	if err := sn.Notify(os); err != nil {
 		return err
 	}
-	text := "*esa-freshness-patroller's result* : \n```" + buf.String() + "```"
+	text := ":closed_book: *esa-freshness-patroller's result* : \n"
+	for _, o := range os {
+		text += fmt.Sprintf(
+			"- <%s|%s> maybe outdated. Last checked at %s by %s\n",
+			o.URL, o.Title, o.LastCheckedAt.Format("2006-01-02"), o.Owner,
+		)
+	}
 	_, _, err := n.client.PostMessage(n.channel, slack.MsgOptionText(text, false))
 	return err
 }
