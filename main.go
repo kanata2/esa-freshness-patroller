@@ -27,10 +27,13 @@ func run(args []string) error {
 	}
 
 	if cfg.EsaApiKey == "" || cfg.Team == "" {
-		return fmt.Errorf("API key and team must be set by environment variable or config.yaml")
+		return fmt.Errorf("esa API key and team must be set")
 	}
 	var notifier Notifier = &defaultNotifier{out: os.Stdout}
 	if cfg.NotificationType == "slack" {
+		if cfg.Slack.Token == "" || cfg.Slack.Channel == "" {
+			return fmt.Errorf("slack API key and chaannel must be set")
+		}
 		notifier = &slackNotifier{
 			client:  slack.New(cfg.Slack.Token),
 			channel: cfg.Slack.Channel,

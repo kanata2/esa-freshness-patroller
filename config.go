@@ -29,9 +29,6 @@ type emailConfig struct {
 
 func newConfigFrom(args []string) (*config, error) {
 	v := viper.New()
-	v.AutomaticEnv()
-	v.RegisterAlias("EsaApiKey", "ESA_API_KEY")
-	v.RegisterAlias("slack.token", "SLACK_TOKEN")
 
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
 	fs.String("query", "", "scan by query")
@@ -42,10 +39,27 @@ func newConfigFrom(args []string) (*config, error) {
 
 	v.SetConfigType("yaml")
 	v.AddConfigPath(".")
-	v.SetConfigName("config.yaml")
-	v.SetConfigName(viper.GetString("config"))
+	v.SetConfigName("config")
+	if cfgPath := v.GetString("config"); cfgPath != "" {
+		v.SetConfigFile(cfgPath)
+	}
 	if err := v.ReadInConfig(); err != nil {
-		return nil, err
+		if e, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return nil, e
+		}
+	}
+	v.AutomaticEnv()
+
+	// FIXME: workaround in order to overwrite by env vars
+	for ek, k := range map[string]string{
+		"ESA_API_KEY":       "esaApiKey",
+		"NOTIFICATION_TYPE": "notificationType",
+		"SLACK_TOKEN":       "slack.token",
+		"SLACK_CHANNEL":     "slack.channel",
+	} {
+		if s := v.GetString(ek); s != "" {
+			v.Set(k, s)
+		}
 	}
 
 	var c *config
