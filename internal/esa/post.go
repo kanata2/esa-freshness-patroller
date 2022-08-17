@@ -1,12 +1,12 @@
 package esa
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -107,8 +107,8 @@ func WithListPostsOptionPerPage(n int) ListPostsOption {
 	}
 }
 
-func (c *Client) ListPosts(ctx context.Context, team string, opts ...ListPostsOption) (*ListPostsResponse, error) {
-	req, err := c.newRequest(ctx, http.MethodGet, path.Join("teams", team, "posts"), nil)
+func (c *Client) ListPosts(ctx context.Context, opts ...ListPostsOption) (*ListPostsResponse, error) {
+	req, err := c.newRequest(ctx, http.MethodGet, fmt.Sprintf("teams/%s/posts", c.team), nil)
 	if err != nil {
 		return nil, fmt.Errorf("ListPosts: %w", err)
 	}
@@ -129,6 +129,92 @@ func (c *Client) ListPosts(ctx context.Context, team string, opts ...ListPostsOp
 	var ret *ListPostsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
 		return nil, fmt.Errorf("ListPosts: %w", err)
+	}
+	return ret, nil
+}
+
+type PostParamsOption func(*postParams)
+
+type postParams struct {
+	Name           string   `json:"name"`
+	BodyMarkdown   string   `json:"body_md,omitempty"`
+	Tags           []string `json:"tags,omitempty"`
+	Category       string   `json:"category,omitempty"`
+	WIP            bool     `json:"wip"`
+	Message        string   `json:"message,omitempty"`
+	User           string   `json:"user,omitempty"`
+	TemplatePostID int      `json:"template_post_id,omitempty"`
+}
+
+func WithCreatePostOptionBody(b string) PostParamsOption {
+	return func(p *postParams) {
+		p.BodyMarkdown = b
+	}
+}
+
+func WithCreatePostOptionTags(tags []string) PostParamsOption {
+	return func(p *postParams) {
+		p.Tags = tags
+	}
+}
+
+func WithCreatePostOptionCategory(c string) PostParamsOption {
+	return func(p *postParams) {
+		p.Category = c
+	}
+}
+
+func WithCreatePostOptionShipIt() PostParamsOption {
+	return func(p *postParams) {
+		p.WIP = false
+	}
+}
+
+func WithCreatePostOptionMessage(m string) PostParamsOption {
+	return func(p *postParams) {
+		p.Message = m
+	}
+}
+
+func WithCreatePostOptionUser(u string) PostParamsOption {
+	return func(p *postParams) {
+		p.User = u
+	}
+}
+
+func WithCreatePostOptionTemplatePostID(id int) PostParamsOption {
+	return func(p *postParams) {
+		p.TemplatePostID = id
+	}
+}
+
+type createPostRequest struct {
+	Post postParams `json:"post"`
+}
+
+func (c *Client) CreatePost(ctx context.Context, name string, opts ...PostParamsOption) (*Post, error) {
+	params := postParams{Name: name, WIP: true}
+	for _, opt := range opts {
+		opt(&params)
+	}
+	body := new(bytes.Buffer)
+	if err := json.NewEncoder(body).Encode(createPostRequest{Post: params}); err != nil {
+		return nil, fmt.Errorf("CreatePost: %w", err)
+	}
+	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("teams/%s/posts", c.team), body)
+	if err != nil {
+		return nil, fmt.Errorf("CreatePost: %w", err)
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("CreatePost: %w", err)
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("CreatePost: %s", resp.Status)
+	}
+	var ret *Post
+	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
+		return nil, fmt.Errorf("CreatePost: %w", err)
 	}
 	return ret, nil
 }

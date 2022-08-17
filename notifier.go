@@ -3,31 +3,22 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"io"
 
-	"github.com/olekukonko/tablewriter"
 	"github.com/slack-go/slack"
 )
 
 type Notifier interface {
-	Notify(os []*MaybeOutdated) error
+	Notify(os []*MaybeOutdated, template *template.Template) error
 }
 
 type defaultNotifier struct {
 	out io.Writer
 }
 
-func (n *defaultNotifier) Notify(os []*MaybeOutdated) error {
-	table := tablewriter.NewWriter(n.out)
-	table.SetBorder(false)
-	table.SetHeader([]string{"OWNER", "TITLE", "URL", "LAST REVIEWED AT"})
-	rows := make([][]string, 0, len(os))
-	for _, o := range os {
-		rows = append(rows, []string{o.Owner, o.Title, o.URL, o.LastCheckedAt.Format("2006-01-02")})
-	}
-	table.AppendBulk(rows)
-	table.Render()
-	return nil
+func (n *defaultNotifier) Notify(os []*MaybeOutdated, tmpl *template.Template) error {
+	return tmpl.Execute(n.out, os)
 }
 
 type slackNotifier struct {
@@ -35,20 +26,12 @@ type slackNotifier struct {
 	channel string
 }
 
-func (n *slackNotifier) Notify(os []*MaybeOutdated) error {
+func (n *slackNotifier) Notify(os []*MaybeOutdated, tmpl *template.Template) error {
 	buf := new(bytes.Buffer)
-	sn := defaultNotifier{out: buf}
-	if err := sn.Notify(os); err != nil {
+	if err := tmpl.Execute(buf, os); err != nil {
 		return err
 	}
-	text := ":closed_book: *esa-freshness-patroller's result* : \n"
-	for _, o := range os {
-		text += fmt.Sprintf(
-			"- <%s|%s> maybe outdated. Last checked at %s by %s\n",
-			o.URL, o.Title, o.LastCheckedAt.Format("2006-01-02"), o.Owner,
-		)
-	}
-	_, _, err := n.client.PostMessage(n.channel, slack.MsgOptionText(text, false))
+	_, _, err := n.client.PostMessage(n.channel, slack.MsgOptionText(buf.String(), false))
 	return err
 }
 

@@ -16,10 +16,6 @@ query: 'in:"Users/kanata2" Spec'
 EOF
 
 $ ESA_API_KEY=xxx esa-freshness-patroller
-    OWNER    |    TITLE     |                  URL                   | LAST REVIEWED AT
--------------+--------------+----------------------------------------+-------------------
-  @kanata2   | Spec A       | https://kanata2-sandbox.esa.io/posts/1 | 2022-03-10
-  @kanata2   | Spec B       | https://kanata2-sandbox.esa.io/posts/2 | 2021-02-11
 ```
 
 If you want to notify Slack, then run as below.
@@ -44,7 +40,8 @@ $ ESA_API_KEY=xxx SLACK_TOKEN=yyy esa-freshness-patroller
 | esa team | Yes | String | `TEAM` | | team | 
 | esa's search query | Yes | String | `QUERY` | `--query` | query |
 | config file | No(default: ./config.yaml) | String | | `--config` | |
+| template file | No | String | | `--template` | template |
 | debug mode | No | Bool | `DEBUG` | | debug |
-| notification type | No(default: '') | String | | | notificationType |
+| output type | No(default: '') | String | | | outputType |
 | slack's Token | No | String | `SLACK_TOKEN` | | slack.token (not recommended) |
 | slack's notification channel | No | String | | | slack.channel |

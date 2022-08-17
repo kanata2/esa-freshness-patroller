@@ -42,7 +42,8 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			err = perr
 			return blackfriday.Terminate
 		}
-		// 3 month
+		// TODO: Make this period user-definable
+		// 3 months
 		if date.AddDate(0, 3, 0).After(time.Now()) {
 			return blackfriday.Terminate
 		}

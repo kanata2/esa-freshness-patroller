@@ -8,12 +8,14 @@ import (
 )
 
 const (
-	v1BaseURL = "https://api.esa.io/v1"
+	v1BaseURL          = "https://api.esa.io/v1"
+	MaxElementsPerPage = 100
 )
 
 type Client struct {
 	baseURL    string
 	apiKey     string
+	team       string
 	httpClient *http.Client
 	debug      bool
 }
@@ -32,10 +34,11 @@ func WithDebug() clientOption {
 	}
 }
 
-func NewClient(apiKey string, opts ...clientOption) *Client {
+func NewClient(team, apiKey string, opts ...clientOption) *Client {
 	c := &Client{
 		baseURL:    v1BaseURL,
 		apiKey:     apiKey,
+		team:       team,
 		httpClient: http.DefaultClient,
 	}
 	for _, opt := range opts {
@@ -52,6 +55,9 @@ func (c *Client) newRequest(ctx context.Context, method, rpath string, body io.R
 	}
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 	req.Header.Set("User-Agent", fmt.Sprintf("esa-freshness-patroller/v%s", version))
+	if method == http.MethodPost || method == http.MethodPatch {
+		req.Header.Set("Content-Type", "application/json")
+	}
 
 	return req, nil
 }

@@ -1,0 +1,6 @@
+Scan by esa-freshbess-patroller.
+The followings are posts which are not reviewed by owner more than 3 months.
+
+{{ range . -}}
+* {{ .Title }} was last checked at {{ .LastCheckedAt.Format "2006-01-02" }}. It maybe outdated. (URL: {{ .URL }}, OWNER: {{ .Owner }}
+{{ end -}}

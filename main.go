@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"os"
 	"time"
@@ -30,7 +31,7 @@ func run(args []string) error {
 		return fmt.Errorf("esa API key and team must be set")
 	}
 	var notifier Notifier = &defaultNotifier{out: os.Stdout}
-	if cfg.NotificationType == "slack" {
+	if cfg.OutputType == "slack" {
 		if cfg.Slack.Token == "" || cfg.Slack.Channel == "" {
 			return fmt.Errorf("slack API key and chaannel must be set")
 		}
@@ -39,11 +40,19 @@ func run(args []string) error {
 			channel: cfg.Slack.Channel,
 		}
 	}
+	tmpl, _ := template.New("default").Parse(defaultTemplate)
+	if cfg.Template != "" {
+		tmpl, err = template.ParseFiles(cfg.Template)
+		if err != nil {
+			return err
+		}
+	}
 	app := app{
 		config:   cfg,
 		debug:    cfg.Debug,
-		client:   esa.NewClient(cfg.EsaApiKey),
+		client:   esa.NewClient(cfg.Team, cfg.EsaApiKey),
 		checker:  &checker{},
+		template: tmpl,
 		notifier: notifier,
 		logger:   log.Default(),
 	}
@@ -56,6 +65,7 @@ type app struct {
 	config   *config
 	client   *esa.Client
 	checker  Checker
+	template *template.Template
 	notifier Notifier
 	logger   *log.Logger
 }
@@ -80,10 +90,9 @@ func (app app) run(ctx context.Context, args []string) error {
 	for {
 		resp, err := app.client.ListPosts(
 			ctx,
-			app.config.Team,
 			esa.WithListPostsOptionQuery(app.config.Query),
 			esa.WithListPostsOptionPage(page),
-			esa.WithListPostsOptionPerPage(100),
+			esa.WithListPostsOptionPerPage(esa.MaxElementsPerPage),
 		)
 		if err != nil {
 			return err
@@ -107,7 +116,7 @@ func (app app) run(ctx context.Context, args []string) error {
 		}
 		page = *resp.NextPage
 	}
-	if err := app.notifier.Notify(outdateCandidates); err != nil {
+	if err := app.notifier.Notify(outdateCandidates, app.template); err != nil {
 		return err
 	}
 	return nil
@@ -119,3 +128,12 @@ type MaybeOutdated struct {
 	LastCheckedAt time.Time
 	Owner         string
 }
+
+const (
+	defaultTemplate = `Scan by esa-freshbess-patroller.
+The followings are posts which are not reviewed by owner more than 3 months.
+
+{{ range . -}}
+* {{ .Title }} was last checked at {{ .LastCheckedAt.Format "2006-01-02" }}. It maybe outdated. (URL: {{ .URL }}, OWNER: {{ .Owner }}
+{{ end -}}`
+)

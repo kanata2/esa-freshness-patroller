@@ -8,13 +8,14 @@ import (
 )
 
 type config struct {
-	Debug            bool
-	EsaApiKey        string
-	Team             string
-	Query            string
-	NotificationType string
-	Slack            *slackConfig
-	Email            *emailConfig
+	Debug      bool
+	EsaApiKey  string
+	Team       string
+	Query      string
+	Template   string
+	OutputType string
+	Slack      *slackConfig
+	Email      *emailConfig
 }
 
 type slackConfig struct {
@@ -32,10 +33,25 @@ func newConfigFrom(args []string) (*config, error) {
 
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
 	fs.String("query", "", "scan by query")
-	fs.String("config", "", "filename for configuration yaml")
+	fs.String("config", "", "filepath for configuration yaml")
+	fs.String("template", "", "filepath for template of patrolled result")
 	pflag.CommandLine.AddGoFlagSet(fs)
 	pflag.Parse()
 	v.BindPFlags(pflag.CommandLine)
+
+	v.AutomaticEnv()
+
+	// FIXME: workaround in order to overwrite by env vars
+	for ek, k := range map[string]string{
+		"ESA_API_KEY":   "esaApiKey",
+		"OUTPUT_TYPE":   "outputType",
+		"SLACK_TOKEN":   "slack.token",
+		"SLACK_CHANNEL": "slack.channel",
+	} {
+		if s := v.GetString(ek); s != "" {
+			v.Set(k, s)
+		}
+	}
 
 	v.SetConfigType("yaml")
 	v.AddConfigPath(".")
@@ -46,19 +62,6 @@ func newConfigFrom(args []string) (*config, error) {
 	if err := v.ReadInConfig(); err != nil {
 		if e, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return nil, e
-		}
-	}
-	v.AutomaticEnv()
-
-	// FIXME: workaround in order to overwrite by env vars
-	for ek, k := range map[string]string{
-		"ESA_API_KEY":       "esaApiKey",
-		"NOTIFICATION_TYPE": "notificationType",
-		"SLACK_TOKEN":       "slack.token",
-		"SLACK_CHANNEL":     "slack.channel",
-	} {
-		if s := v.GetString(ek); s != "" {
-			v.Set(k, s)
 		}
 	}
 
