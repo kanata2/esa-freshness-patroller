@@ -37,11 +37,13 @@ $ ESA_API_KEY=xxx SLACK_TOKEN=yyy esa-freshness-patroller
 | Name | Required | Type | Environment variable | CLI argument | key for Config file(YAML) |
 | ---- | -------- | ---- | -------------------- | ------------ | ----------------- |
 | esa.io's API Key | Yes | String | `ESA_API_KEY` | | esaApiKey (not recommended) |
-| esa team | Yes | String | `TEAM` | | team | 
+| esa team | Yes | String | `TEAM` | `--team` | team | 
 | esa's search query | Yes | String | `QUERY` | `--query` | query |
-| config file | No(default: ./config.yaml) | String | | `--config` | |
-| template file | No | String | | `--template` | template |
+| config file | No(default: ./config.yaml) | String | `CONFIG` | `--config` | |
+| template file | No | String | `TEMPLATE` | `--template` | template |
 | debug mode | No | Bool | `DEBUG` | | debug |
-| output type | No(default: '') | String | | | outputType |
+| output type | No(default: '') | String | `OUTPUT_TYPE` | | outputType |
 | slack's Token | No | String | `SLACK_TOKEN` | | slack.token (not recommended) |
 | slack's notification channel | No | String | | | slack.channel |
+
+Priority: CLI arguments > Environment variables > Config file

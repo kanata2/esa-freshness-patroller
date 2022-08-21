@@ -32,7 +32,9 @@ func newConfigFrom(args []string) (*config, error) {
 	v := viper.New()
 
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
-	fs.String("query", "", "scan by query")
+	fs.String("team", "", "esa.io's team")
+	fs.String("query", "", "esa.io's search query for scanning. more details: https://docs.esa.io/posts/104")
+	fs.String("output", "", "output type(stdout, slack)")
 	fs.String("config", "", "filepath for configuration yaml")
 	fs.String("template", "", "filepath for template of patrolled result")
 	pflag.CommandLine.AddGoFlagSet(fs)

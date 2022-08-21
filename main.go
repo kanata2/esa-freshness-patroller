@@ -26,6 +26,7 @@ func run(args []string) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("%#v", cfg)
 
 	if cfg.EsaApiKey == "" || cfg.Team == "" {
 		return fmt.Errorf("esa API key and team must be set")
