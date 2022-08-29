@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/kanata2/esa-freshness-patroller/internal/esa"
-	"github.com/slack-go/slack"
 )
 
 func main() {
@@ -26,49 +25,43 @@ func run(args []string) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("%#v", cfg)
 
 	if cfg.EsaApiKey == "" || cfg.Team == "" {
 		return fmt.Errorf("esa API key and team must be set")
 	}
-	var notifier Notifier = &defaultNotifier{out: os.Stdout}
-	if cfg.OutputType == "slack" {
-		if cfg.Slack.Token == "" || cfg.Slack.Channel == "" {
-			return fmt.Errorf("slack API key and chaannel must be set")
-		}
-		notifier = &slackNotifier{
-			client:  slack.New(cfg.Slack.Token),
-			channel: cfg.Slack.Channel,
-		}
+	var outputter Outputter = &jsonOutputter{out: os.Stdout}
+
+	app := app{
+		config:    cfg,
+		debug:     cfg.Debug,
+		client:    esa.NewClient(cfg.Team, cfg.EsaApiKey),
+		checker:   &checker{},
+		outputter: outputter,
+		logger:    log.Default(),
 	}
-	tmpl, _ := template.New("default").Parse(defaultTemplate)
-	if cfg.Template != "" {
-		tmpl, err = template.ParseFiles(cfg.Template)
+
+	if cfg.Output == "go-template" {
+		if cfg.Template != "" {
+			return fmt.Errorf("must set template when specify go-template output type")
+		}
+		tmpl, err := template.ParseFiles(cfg.Template)
 		if err != nil {
 			return err
 		}
-	}
-	app := app{
-		config:   cfg,
-		debug:    cfg.Debug,
-		client:   esa.NewClient(cfg.Team, cfg.EsaApiKey),
-		checker:  &checker{},
-		template: tmpl,
-		notifier: notifier,
-		logger:   log.Default(),
+		app.outputter = &goTemplateOutputter{tmpl: tmpl, out: os.Stdout}
 	}
 
 	return app.run(ctx, args)
 }
 
 type app struct {
-	debug    bool
-	config   *config
-	client   *esa.Client
-	checker  Checker
-	template *template.Template
-	notifier Notifier
-	logger   *log.Logger
+	debug     bool
+	config    *config
+	client    *esa.Client
+	checker   Checker
+	template  *template.Template
+	outputter Outputter
+	logger    *log.Logger
 }
 
 func (app app) Debugf(format string, v ...interface{}) {
@@ -87,7 +80,7 @@ func (app app) Warnf(format string, v ...interface{}) {
 
 func (app app) run(ctx context.Context, args []string) error {
 	page := 1
-	outdateCandidates := []*MaybeOutdated{}
+	var result Result
 	for {
 		resp, err := app.client.ListPosts(
 			ctx,
@@ -102,7 +95,11 @@ func (app app) run(ctx context.Context, args []string) error {
 		for _, p := range resp.Posts {
 			mo, err := app.checker.Check(p.BodyMarkdown)
 			if err != nil {
-				app.Warnf("failed to check whether outdated or not. %s(URL: %s) reason: %s", p.Name, p.URL, err)
+				result.Warnings = append(result.Warnings, &Warning{
+					Title:  p.Name,
+					URL:    p.URL,
+					Reason: err.Error(),
+				})
 				continue
 			}
 			if mo == nil {
@@ -110,31 +107,33 @@ func (app app) run(ctx context.Context, args []string) error {
 			}
 			mo.Title = p.Name
 			mo.URL = p.URL
-			outdateCandidates = append(outdateCandidates, mo)
+			result.Items = append(result.Items, mo)
 		}
 		if resp.NextPage == nil {
 			break
 		}
 		page = *resp.NextPage
 	}
-	if err := app.notifier.Notify(outdateCandidates, app.template); err != nil {
+	if err := app.outputter.Output(result); err != nil {
 		return err
 	}
 	return nil
 }
 
-type MaybeOutdated struct {
-	Title         string
-	URL           string
-	LastCheckedAt time.Time
-	Owner         string
+type Result struct {
+	Items    []*MaybeOutdated `json:"items"`
+	Warnings []*Warning       `json:"warnings"`
 }
 
-const (
-	defaultTemplate = `Scan by esa-freshbess-patroller.
-The followings are posts which are not reviewed by owner more than 3 months.
+type MaybeOutdated struct {
+	Title         string    `json:"title"`
+	URL           string    `json:"url"`
+	LastCheckedAt time.Time `json:"last_checked_at"`
+	Owner         string    `json:"owner"`
+}
 
-{{ range . -}}
-* {{ .Title }} was last checked at {{ .LastCheckedAt.Format "2006-01-02" }}. It maybe outdated. (URL: {{ .URL }}, OWNER: {{ .Owner }}
-{{ end -}}`
-)
+type Warning struct {
+	Title  string `json:"title"`
+	URL    string `json:"url"`
+	Reason string `json:"reason"`
+}

@@ -18,20 +18,6 @@ EOF
 $ ESA_API_KEY=xxx esa-freshness-patroller
 ```
 
-If you want to notify Slack, then run as below.
-
-``` sh
-$ cat <<EOF > config.yaml
-team: kanata2-sandbox
-query: 'in:"Users/kanata2" Spec'
-notificationType: slack
-slack:
-  channel: CXXXXXXX
-EOF
-
-$ ESA_API_KEY=xxx SLACK_TOKEN=yyy esa-freshness-patroller
-```
-
 ### Configurations
 
 | Name | Required | Type | Environment variable | CLI argument | key for Config file(YAML) |
@@ -40,10 +26,8 @@ $ ESA_API_KEY=xxx SLACK_TOKEN=yyy esa-freshness-patroller
 | esa team | Yes | String | `TEAM` | `--team` | team | 
 | esa's search query | Yes | String | `QUERY` | `--query` | query |
 | config file | No(default: ./config.yaml) | String | `CONFIG` | `--config` | |
-| template file | No | String | `TEMPLATE` | `--template` | template |
+| template file | No | String | `TEMPLATE` | `--template` | template file path for `--output=go-template` |
 | debug mode | No | Bool | `DEBUG` | | debug |
-| output type | No(default: '') | String | `OUTPUT_TYPE` | | outputType |
-| slack's Token | No | String | `SLACK_TOKEN` | | slack.token (not recommended) |
-| slack's notification channel | No | String | | | slack.channel |
+| output type | No(default: 'json') | String | `OUTPUT_TYPE` | | outputType(json or go-template) |
 
 Priority: CLI arguments > Environment variables > Config file

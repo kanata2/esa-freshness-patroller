@@ -4,19 +4,16 @@ go 1.18
 
 require (
 	github.com/google/go-cmp v0.5.7
-	github.com/olekukonko/tablewriter v0.0.5
+	github.com/jszwec/csvutil v1.7.1
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/slack-go/slack v0.10.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.11.0
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
-	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect

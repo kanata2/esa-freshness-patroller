@@ -8,14 +8,14 @@ import (
 )
 
 type config struct {
-	Debug      bool
-	EsaApiKey  string
-	Team       string
-	Query      string
-	Template   string
-	OutputType string
-	Slack      *slackConfig
-	Email      *emailConfig
+	Debug     bool
+	EsaApiKey string
+	Team      string
+	Query     string
+	Template  string
+	Output    string
+	Slack     *slackConfig
+	Email     *emailConfig
 }
 
 type slackConfig struct {
@@ -34,7 +34,7 @@ func newConfigFrom(args []string) (*config, error) {
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
 	fs.String("team", "", "esa.io's team")
 	fs.String("query", "", "esa.io's search query for scanning. more details: https://docs.esa.io/posts/104")
-	fs.String("output", "", "output type(stdout, slack)")
+	fs.String("output", "", "output type(json, go-template)")
 	fs.String("config", "", "filepath for configuration yaml")
 	fs.String("template", "", "filepath for template of patrolled result")
 	pflag.CommandLine.AddGoFlagSet(fs)
@@ -46,7 +46,7 @@ func newConfigFrom(args []string) (*config, error) {
 	// FIXME: workaround in order to overwrite by env vars
 	for ek, k := range map[string]string{
 		"ESA_API_KEY":   "esaApiKey",
-		"OUTPUT_TYPE":   "outputType",
+		"OUTPUT":        "output",
 		"SLACK_TOKEN":   "slack.token",
 		"SLACK_CHANNEL": "slack.channel",
 	} {

@@ -54,7 +54,7 @@ type ListPostsOption func(url.Values) error
 
 func WithListPostsOptionOrder(o string) ListPostsOption {
 	return func(v url.Values) error {
-		if o != "desc" || o != "asc" {
+		if o != "desc" && o != "asc" {
 			return fmt.Errorf("%s is wrong ordering value. must be specify desc or asc", o)
 		}
 		v.Add("order", o)
