@@ -41,7 +41,7 @@ func run(args []string) error {
 	}
 
 	if cfg.Output == "go-template" {
-		if cfg.Template != "" {
+		if cfg.Template == "" {
 			return fmt.Errorf("must set template when specify go-template output type")
 		}
 		tmpl, err := template.ParseFiles(cfg.Template)
