@@ -29,15 +29,19 @@ func run(args []string) error {
 	if cfg.EsaApiKey == "" || cfg.Team == "" {
 		return fmt.Errorf("esa API key and team must be set")
 	}
-	var outputter Outputter = &jsonOutputter{out: os.Stdout}
+	var (
+		transformer Transformer = &jsonTransformer{}
+		sender      Sender      = &stdoutSender{}
+	)
 
 	app := app{
-		config:    cfg,
-		debug:     cfg.Debug,
-		client:    esa.NewClient(cfg.Team, cfg.EsaApiKey),
-		checker:   &checker{},
-		outputter: outputter,
-		logger:    log.Default(),
+		config:      cfg,
+		debug:       cfg.Debug,
+		client:      esa.NewClient(cfg.Team, cfg.EsaApiKey),
+		checker:     &checker{},
+		transformer: transformer,
+		sender:      sender,
+		logger:      log.Default(),
 	}
 
 	if cfg.Output == "go-template" {
@@ -48,20 +52,31 @@ func run(args []string) error {
 		if err != nil {
 			return err
 		}
-		app.outputter = &goTemplateOutputter{tmpl: tmpl, out: os.Stdout}
+		app.transformer = &goTemplateTransformer{tmpl: tmpl}
+	}
+
+	if cfg.Destination == "esa" {
+		if cfg.Esa == nil || cfg.Esa.ReportPostNumber == 0 {
+			return fmt.Errorf("must set a number of esa post for updating when specify esa destination type")
+		}
+		app.sender = &esaSender{
+			client:           app.client,
+			reportPostNumber: cfg.Esa.ReportPostNumber,
+		}
 	}
 
 	return app.run(ctx, args)
 }
 
 type app struct {
-	debug     bool
-	config    *config
-	client    *esa.Client
-	checker   Checker
-	template  *template.Template
-	outputter Outputter
-	logger    *log.Logger
+	debug       bool
+	config      *config
+	client      *esa.Client
+	checker     Checker
+	template    *template.Template
+	transformer Transformer
+	sender      Sender
+	logger      *log.Logger
 }
 
 func (app app) Debugf(format string, v ...interface{}) {
@@ -114,10 +129,11 @@ func (app app) run(ctx context.Context, args []string) error {
 		}
 		page = *resp.NextPage
 	}
-	if err := app.outputter.Output(result); err != nil {
+	r, err := app.transformer.Transform(result)
+	if err != nil {
 		return err
 	}
-	return nil
+	return app.sender.Send(r)
 }
 
 type Result struct {

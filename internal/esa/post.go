@@ -136,7 +136,7 @@ func (c *Client) ListPosts(ctx context.Context, opts ...ListPostsOption) (*ListP
 type PostParamsOption func(*postParams)
 
 type postParams struct {
-	Name           string   `json:"name"`
+	Name           string   `json:"name,omitempty"`
 	BodyMarkdown   string   `json:"body_md,omitempty"`
 	Tags           []string `json:"tags,omitempty"`
 	Category       string   `json:"category,omitempty"`
@@ -146,43 +146,43 @@ type postParams struct {
 	TemplatePostID int      `json:"template_post_id,omitempty"`
 }
 
-func WithCreatePostOptionBody(b string) PostParamsOption {
+func WithPostParamsOptionBody(b string) PostParamsOption {
 	return func(p *postParams) {
 		p.BodyMarkdown = b
 	}
 }
 
-func WithCreatePostOptionTags(tags []string) PostParamsOption {
+func WithPostParamsOptionTags(tags []string) PostParamsOption {
 	return func(p *postParams) {
 		p.Tags = tags
 	}
 }
 
-func WithCreatePostOptionCategory(c string) PostParamsOption {
+func WithPostParamsOptionCategory(c string) PostParamsOption {
 	return func(p *postParams) {
 		p.Category = c
 	}
 }
 
-func WithCreatePostOptionShipIt() PostParamsOption {
+func WithPostParamsOptionShipIt() PostParamsOption {
 	return func(p *postParams) {
 		p.WIP = false
 	}
 }
 
-func WithCreatePostOptionMessage(m string) PostParamsOption {
+func WithPostParamsOptionMessage(m string) PostParamsOption {
 	return func(p *postParams) {
 		p.Message = m
 	}
 }
 
-func WithCreatePostOptionUser(u string) PostParamsOption {
+func WithPostParamsOptionUser(u string) PostParamsOption {
 	return func(p *postParams) {
 		p.User = u
 	}
 }
 
-func WithCreatePostOptionTemplatePostID(id int) PostParamsOption {
+func WithPostParamsOptionTemplatePostID(id int) PostParamsOption {
 	return func(p *postParams) {
 		p.TemplatePostID = id
 	}
@@ -215,6 +215,37 @@ func (c *Client) CreatePost(ctx context.Context, name string, opts ...PostParams
 	var ret *Post
 	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
 		return nil, fmt.Errorf("CreatePost: %w", err)
+	}
+	return ret, nil
+}
+
+type updatePostRequest struct {
+	Post postParams `json:"post"`
+}
+
+func (c *Client) UpdatePost(ctx context.Context, postNumber int, opts ...PostParamsOption) (*Post, error) {
+	params := postParams{}
+	for _, opt := range opts {
+		opt(&params)
+	}
+	body := new(bytes.Buffer)
+	if err := json.NewEncoder(body).Encode(updatePostRequest{Post: params}); err != nil {
+		return nil, fmt.Errorf("UpdatePost: %w", err)
+	}
+	req, err := c.newRequest(ctx, http.MethodPatch, fmt.Sprintf("teams/%s/posts/%d", c.team, postNumber), body)
+	if err != nil {
+		return nil, fmt.Errorf("UpdatePost: %w", err)
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("UpdatePost: %w", err)
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("UpdatePost: got status code %d", resp.StatusCode)
+	}
+	var ret *Post
+	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
+		return nil, fmt.Errorf("UpdatePost: %w", err)
 	}
 	return ret, nil
 }

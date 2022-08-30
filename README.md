@@ -26,8 +26,10 @@ $ ESA_API_KEY=xxx esa-freshness-patroller
 | esa team | Yes | String | `TEAM` | `--team` | team | 
 | esa's search query | Yes | String | `QUERY` | `--query` | query |
 | config file | No(default: ./config.yaml) | String | `CONFIG` | `--config` | |
-| template file | No | String | `TEMPLATE` | `--template` | template file path for `--output=go-template` |
 | debug mode | No | Bool | `DEBUG` | | debug |
-| output type | No(default: 'json') | String | `OUTPUT_TYPE` | | outputType(json or go-template) |
+| output type | No(default: 'json') | String(json or go-template) | `OUTPUT_TYPE` | `--output` | outputType |
+| Go template file path | No(Yes if output type is go-template) | String | `TEMPLATE` | `--template` | template |
+| destination type | No(default: 'stdout') | String(stdout or esa) | `DESTINATION` | `--destination` | destination |
+| esa's post number for reporting results | No(Yes if destination type is esa) | Number | | esa.reportPostNumber |
 
 Priority: CLI arguments > Environment variables > Config file

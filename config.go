@@ -8,14 +8,16 @@ import (
 )
 
 type config struct {
-	Debug     bool
-	EsaApiKey string
-	Team      string
-	Query     string
-	Template  string
-	Output    string
-	Slack     *slackConfig
-	Email     *emailConfig
+	Debug       bool
+	EsaApiKey   string
+	Team        string
+	Query       string
+	Template    string
+	Output      string
+	Destination string
+	Slack       *slackConfig
+	Email       *emailConfig
+	Esa         *esaConfig
 }
 
 type slackConfig struct {
@@ -28,13 +30,18 @@ type emailConfig struct {
 	To   string
 }
 
+type esaConfig struct {
+	ReportPostNumber int
+}
+
 func newConfigFrom(args []string) (*config, error) {
 	v := viper.New()
 
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
 	fs.String("team", "", "esa.io's team")
 	fs.String("query", "", "esa.io's search query for scanning. more details: https://docs.esa.io/posts/104")
-	fs.String("output", "", "output type(json, go-template)")
+	fs.String("output", "", "output type(value: json or go-template)")
+	fs.String("destination", "", "destination of output(value: stdout, esa)")
 	fs.String("config", "", "filepath for configuration yaml")
 	fs.String("template", "", "filepath for template of patrolled result")
 	pflag.CommandLine.AddGoFlagSet(fs)
@@ -45,10 +52,12 @@ func newConfigFrom(args []string) (*config, error) {
 
 	// FIXME: workaround in order to overwrite by env vars
 	for ek, k := range map[string]string{
-		"ESA_API_KEY":   "esaApiKey",
-		"OUTPUT":        "output",
-		"SLACK_TOKEN":   "slack.token",
-		"SLACK_CHANNEL": "slack.channel",
+		"ESA_API_KEY":     "esaApiKey",
+		"OUTPUT":          "output",
+		"DESTINATION":     "destination",
+		"SLACK_TOKEN":     "slack.token",
+		"SLACK_CHANNEL":   "slack.channel",
+		"ESA_REPORT_POST": "esa.reportPostNumber",
 	} {
 		if s := v.GetString(ek); s != "" {
 			v.Set(k, s)
