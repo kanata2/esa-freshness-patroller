@@ -1,4 +1,4 @@
-FROM golang:1.19-stretch AS build
+FROM golang:1.18-stretch AS build
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
