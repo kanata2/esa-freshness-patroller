@@ -1,4 +1,4 @@
-package main
+package transform
 
 import (
 	"bytes"
@@ -6,15 +6,21 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+
+	patroller "github.com/kanata2/esa-freshness-patroller"
 )
 
 type Transformer interface {
-	Transform(Result) (io.Reader, error)
+	Transform(*patroller.Result) (io.Reader, error)
 }
 
 type jsonTransformer struct{}
 
-func (t *jsonTransformer) Transform(r Result) (io.Reader, error) {
+func NewJSONTransformer() *jsonTransformer {
+	return &jsonTransformer{}
+}
+
+func (t *jsonTransformer) Transform(r *patroller.Result) (io.Reader, error) {
 	buf := new(bytes.Buffer)
 	if err := json.NewEncoder(buf).Encode(&r); err != nil {
 		return nil, fmt.Errorf("jsonTransformer.Transform: %w", err)
@@ -26,7 +32,11 @@ type goTemplateTransformer struct {
 	tmpl *template.Template
 }
 
-func (t *goTemplateTransformer) Transform(r Result) (io.Reader, error) {
+func NewGoTemplateTransformer(t *template.Template) *goTemplateTransformer {
+	return &goTemplateTransformer{tmpl: t}
+}
+
+func (t *goTemplateTransformer) Transform(r *patroller.Result) (io.Reader, error) {
 	buf := new(bytes.Buffer)
 	if err := t.tmpl.Execute(buf, &r); err != nil {
 		return nil, fmt.Errorf("goTemplateTransformer.Transform: %w", err)

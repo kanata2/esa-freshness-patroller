@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"flag"
@@ -34,7 +34,7 @@ type esaConfig struct {
 	ReportPostNumber int
 }
 
-func newConfigFrom(args []string) (*config, error) {
+func New(args []string) (*config, error) {
 	v := viper.New()
 
 	fs := flag.NewFlagSet("esa-freshness-patroller", flag.ExitOnError)
