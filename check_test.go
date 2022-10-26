@@ -14,9 +14,34 @@ func TestChecker_Check(t *testing.T) {
 		ExpectedValue *MaybeOutdated
 		ExpectedError error
 	}{
-		{"post-1.md", nil, nil},
-		{"post-2.md", nil, nil},
-		{"post-3.md", &MaybeOutdated{"", "", time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC), "@kanata2"}, nil},
+		{
+			"post-1.md",
+			&MaybeOutdated{
+				Title:         "",
+				URL:           "",
+				LastCheckedAt: time.Date(2022, 6, 1, 0, 0, 0, 0, time.UTC),
+				Owners:        []string{"@kanata2"},
+			},
+			nil,
+		},
+		{
+			"post-2.md",
+			&MaybeOutdated{
+				Title:         "",
+				URL:           "",
+				LastCheckedAt: time.Date(2022, 6, 1, 0, 0, 0, 0, time.UTC),
+				Owners:        []string{"@kanata2"},
+			},
+			nil},
+		{
+			"post-3.md",
+			&MaybeOutdated{
+				Title:         "",
+				URL:           "",
+				LastCheckedAt: time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+				Owners:        []string{"@kanata2", "@kanata1"},
+			},
+			nil},
 		// {"post-4.md", nil, parseError},
 	}
 	checker := &checker{}

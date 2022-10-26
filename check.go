@@ -31,7 +31,7 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			return blackfriday.GoToNext
 		}
 		words := strings.Split(string(n.Literal), " ")
-		// Last checked at YYYY/MM/DD by @username
+		// Last checked at YYYY/MM/DD by @username1,@username2,...
 		// 0    1       2  3          4  5
 		// <---------------- 6 ------------------>
 		if len(words) < 6 {
@@ -48,15 +48,28 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			return blackfriday.Terminate
 		}
 		mo.LastCheckedAt = date
-		mo.Owner = strings.TrimSpace(words[5])
+		mo.Owners = normalizeOwners(words[5])
 
 		return blackfriday.Terminate
 	})
 	if err != nil {
 		return nil, err
 	}
-	if mo.Owner == "" {
+	if len(mo.Owners) == 0 {
 		return nil, nil
 	}
 	return &mo, nil
+}
+
+func normalizeOwners(s string) []string {
+	splitOwners := strings.Split(s, ",")
+	owners := make([]string, 0, len(splitOwners))
+	for i := range splitOwners {
+		normalized := strings.TrimSpace(splitOwners[i])
+		if normalized == "" {
+			continue
+		}
+		owners = append(owners, normalized)
+	}
+	return owners
 }

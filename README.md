@@ -6,7 +6,7 @@ This is inspired by Google's efforts as described in "Software Engineering at Go
 
 ## How to use
 
-1. Adding `Last checked at YYYY/MM/DD by @username` in your documents
+1. Adding `Last checked at YYYY/MM/DD by @username,@username2,...` in your documents
 2. Run `esa-freshness-patroller` as below
 
 ``` sh

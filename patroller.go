@@ -101,7 +101,7 @@ type MaybeOutdated struct {
 	Title         string    `json:"title"`
 	URL           string    `json:"url"`
 	LastCheckedAt time.Time `json:"last_checked_at"`
-	Owner         string    `json:"owner"`
+	Owners        []string  `json:"owners"`
 }
 
 type Warning struct {
