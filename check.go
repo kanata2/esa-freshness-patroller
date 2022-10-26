@@ -31,9 +31,9 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			return blackfriday.GoToNext
 		}
 		words := strings.Split(string(n.Literal), " ")
-		// Last checked at YYYY/MM/DD by @username1,@username2,...
-		// 0    1       2  3          4  5
-		// <---------------- 6 ------------------>
+		// Last checked at YYYY/MM/DD by @username1, @username2,...
+		// 0    1       2  3          4  5...
+		// <-------------- 5 --------->  <------ 1~ -------------->
 		if len(words) < 6 {
 			return blackfriday.Terminate
 		}
@@ -48,7 +48,7 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			return blackfriday.Terminate
 		}
 		mo.LastCheckedAt = date
-		mo.Owners = normalizeOwners(words[5])
+		mo.Owners = normalizeOwners(strings.Join(words[5:], ""))
 
 		return blackfriday.Terminate
 	})

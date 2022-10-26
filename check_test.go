@@ -39,7 +39,7 @@ func TestChecker_Check(t *testing.T) {
 				Title:         "",
 				URL:           "",
 				LastCheckedAt: time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
-				Owners:        []string{"@kanata2", "@kanata1"},
+				Owners:        []string{"@kanata2", "@kanata1", "@kanata3"},
 			},
 			nil},
 		// {"post-4.md", nil, parseError},
