@@ -13,7 +13,7 @@ type patroller struct {
 	debug    bool
 	client   *esa.Client
 	query    string
-	checker  Checker
+	checker  *checker
 	template *template.Template
 	logger   *log.Logger
 }
@@ -26,11 +26,17 @@ func WithDebug() PatrollerOptionFn {
 	}
 }
 
+func WithCheckThreshold(day int) PatrollerOptionFn {
+	return func(p *patroller) {
+		p.checker.checkThreshold = day
+	}
+}
+
 func New(esaApiKey, esaTeam, query string, opts ...PatrollerOptionFn) patroller {
 	p := patroller{
 		client:  esa.NewClient(esaTeam, esaApiKey),
 		query:   query,
-		checker: &checker{},
+		checker: &checker{checkThreshold: 180},
 		logger:  log.Default(),
 	}
 	for _, opt := range opts {
