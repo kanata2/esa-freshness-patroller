@@ -59,7 +59,7 @@ func run(argv []string) error {
 	}
 
 	if cfg.OutdatedThreshold > 0 {
-		opts = append(opts, patroller.WithCheckThreshold(cfg.OutdatedThreshold))
+		opts = append(opts, patroller.WithCheckerThreshold(cfg.OutdatedThreshold))
 	}
 
 	p := patroller.New(cfg.EsaApiKey, cfg.Team, cfg.Query, opts...)

@@ -45,7 +45,7 @@ func New(args []string) (*config, error) {
 	fs.String("destination", "", "destination of output(value: stdout, esa)")
 	fs.String("config", "", "filepath for configuration yaml")
 	fs.String("template", "", "filepath for template of patrolled result")
-	fs.Int("outdated-threshold", 180, "filepath for template of patrolled result")
+	fs.Int("outdated-threshold", 90, "filepath for template of patrolled result")
 	pflag.CommandLine.AddGoFlagSet(fs)
 	pflag.Parse()
 	v.BindPFlags(pflag.CommandLine)

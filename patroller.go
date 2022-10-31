@@ -26,9 +26,9 @@ func WithDebug() PatrollerOptionFn {
 	}
 }
 
-func WithCheckThreshold(day int) PatrollerOptionFn {
+func WithCheckerThreshold(day int) PatrollerOptionFn {
 	return func(p *patroller) {
-		p.checker.checkThreshold = day
+		p.checker.threshold = day
 	}
 }
 
@@ -36,7 +36,7 @@ func New(esaApiKey, esaTeam, query string, opts ...PatrollerOptionFn) patroller 
 	p := patroller{
 		client:  esa.NewClient(esaTeam, esaApiKey),
 		query:   query,
-		checker: &checker{checkThreshold: 180},
+		checker: &checker{threshold: 90},
 		logger:  log.Default(),
 	}
 	for _, opt := range opts {
