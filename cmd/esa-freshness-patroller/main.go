@@ -58,6 +58,10 @@ func run(argv []string) error {
 		opts = append(opts, patroller.WithDebug())
 	}
 
+	if cfg.OutdatedThreshold > 0 {
+		opts = append(opts, patroller.WithCheckThreshold(cfg.OutdatedThreshold))
+	}
+
 	p := patroller.New(cfg.EsaApiKey, cfg.Team, cfg.Query, opts...)
 
 	result, err := p.Patrol(ctx)
