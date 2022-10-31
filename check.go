@@ -12,7 +12,8 @@ type Checker interface {
 }
 
 type checker struct {
-	parser *blackfriday.Markdown
+	parser    *blackfriday.Markdown
+	threshold int
 }
 
 func (c *checker) Check(post string) (*MaybeOutdated, error) {
@@ -42,9 +43,7 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			err = perr
 			return blackfriday.Terminate
 		}
-		// TODO: Make this period user-definable
-		// 3 months
-		if date.AddDate(0, 3, 0).After(time.Now()) {
+		if date.AddDate(0, 0, c.threshold).After(time.Now()) {
 			return blackfriday.Terminate
 		}
 		mo.LastCheckedAt = date

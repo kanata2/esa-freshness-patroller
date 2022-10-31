@@ -8,16 +8,17 @@ import (
 )
 
 type config struct {
-	Debug       bool
-	EsaApiKey   string
-	Team        string
-	Query       string
-	Template    string
-	Output      string
-	Destination string
-	Slack       *slackConfig
-	Email       *emailConfig
-	Esa         *esaConfig
+	Debug             bool
+	EsaApiKey         string
+	Team              string
+	Query             string
+	Template          string
+	Output            string
+	Destination       string
+	OutdatedThreshold int
+	Slack             *slackConfig
+	Email             *emailConfig
+	Esa               *esaConfig
 }
 
 type slackConfig struct {
@@ -44,20 +45,24 @@ func New(args []string) (*config, error) {
 	fs.String("destination", "", "destination of output(value: stdout, esa)")
 	fs.String("config", "", "filepath for configuration yaml")
 	fs.String("template", "", "filepath for template of patrolled result")
+	fs.Int("outdated-threshold", 90, "filepath for template of patrolled result")
 	pflag.CommandLine.AddGoFlagSet(fs)
 	pflag.Parse()
 	v.BindPFlags(pflag.CommandLine)
+	// Alias
+	v.BindPFlag("outdatedthreshold", pflag.CommandLine.Lookup("outdated-threshold"))
 
 	v.AutomaticEnv()
 
 	// FIXME: workaround in order to overwrite by env vars
 	for ek, k := range map[string]string{
-		"ESA_API_KEY":     "esaApiKey",
-		"OUTPUT":          "output",
-		"DESTINATION":     "destination",
-		"SLACK_TOKEN":     "slack.token",
-		"SLACK_CHANNEL":   "slack.channel",
-		"ESA_REPORT_POST": "esa.reportPostNumber",
+		"ESA_API_KEY":        "esaApiKey",
+		"OUTPUT":             "output",
+		"OUTDATED_THRESHOLD": "outdatedThreshold",
+		"DESTINATION":        "destination",
+		"SLACK_TOKEN":        "slack.token",
+		"SLACK_CHANNEL":      "slack.channel",
+		"ESA_REPORT_POST":    "esa.reportPostNumber",
 	} {
 		if s := v.GetString(ek); s != "" {
 			v.Set(k, s)
@@ -80,5 +85,6 @@ func New(args []string) (*config, error) {
 	if err := v.Unmarshal(&c); err != nil {
 		return nil, err
 	}
+
 	return c, nil
 }
