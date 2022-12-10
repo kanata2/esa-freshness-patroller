@@ -6,19 +6,40 @@ This is inspired by Google's efforts as described in "Software Engineering at Go
 
 ## How to use
 
-1. Adding `Last checked at YYYY/MM/DD by @username,@username2,...` in your documents
-2. Run `esa-freshness-patroller` as below
+1. Adding metadata in a fenced code which has `esa-freshness-patroller` info string to each post
+2. Run `esa-freshness-patroller`
 
-``` sh
-$ cat <<EOF > config.yaml
-team: kanata2-sandbox
-query: 'in:"Users/kanata2" Spec'
-EOF
+### Metadata for each post
+Metadata can be used for patrolling status and indivisual configurations per post.
+Metadata must be written in YAML according to the following schema.
 
-$ ESA_API_KEY=xxx esa-freshness-patroller
+| Key | Required | Type | Description |
+| --- | -------- | ---- | ----------- |
+| `owners` | Yes | Array of string | documentation owner/reviewer |
+| `last_checked_at` | Yes | String(format: `YYYY/MM/DD`) | last reviewed date by owner/reviewers |
+| `interval` | No | Numbner | day for patrolling interval. this takes precedence over oeverall configuration |
+| `skip` | No | Bool | excluding from patrolling targets |
+| `custom` | No | Mapping(key/value is String) | custom metadata that can be added freely |
+
+
+Example:
+
+````markdown
+```esa-freshness-patroller
+owners:
+  - @kanata2
+  - @kanata1
+last_checked_at: 2022/12/11
+interval: 30
+skip: false
+custom:
+  category: daily
+  team: SRE
 ```
+````
 
-### Configurations
+### General configurations
+You can set general configurations through CLI arguments, environment variables or config file.
 
 | Name | Required | Type | Environment variable | CLI argument | key for Config file(YAML) |
 | ---- | -------- | ---- | -------------------- | ------------ | ----------------- |
