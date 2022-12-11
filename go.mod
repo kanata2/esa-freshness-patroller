@@ -1,6 +1,6 @@
 module github.com/kanata2/esa-freshness-patroller
 
-go 1.18
+go 1.19
 
 require (
 	github.com/goccy/go-yaml v1.9.7
