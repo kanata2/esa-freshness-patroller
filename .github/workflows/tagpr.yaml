@@ -10,9 +10,12 @@ env:
 jobs:
   tagpr:
     runs-on: ubuntu-latest
+    outputs:
+      tag: {{ steps.tagpr.outputs.tag }}
     steps:
     - uses: actions/checkout@v3
-    - uses: Songmu/tagpr@243f771851802e189060b943f77edf40ccf7b9c0 # v1.0.7
+    - id: tagpr
+      uses: Songmu/tagpr@243f771851802e189060b943f77edf40ccf7b9c0 # v1.0.7
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
