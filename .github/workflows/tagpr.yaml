@@ -39,7 +39,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}},valye={{ needs.tagpr.outputs.tag }}
+            type=semver,pattern={{version}},value={{ needs.tagpr.outputs.tag }}
             type=semver,pattern={{major}}.{{minor}},value={{ needs.tagpr.outputs.tag }}
       - uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8 # v3.0.0
         with:
