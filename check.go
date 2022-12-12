@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -16,38 +17,46 @@ type checker struct {
 	threshold int
 }
 
+type annotation struct {
+	Owners        []string          `yaml:"owners"`
+	LastCheckedAt string            `yaml:"last_checked_at"`
+	Interval      int               `yaml:"interval"`
+	Skip          bool              `yaml:"skip"`
+	Custom        map[string]string `yaml:"custom"`
+}
+
 func (c *checker) Check(post string) (*MaybeOutdated, error) {
 	var (
 		mo  MaybeOutdated
 		err error
 	)
-	parser := blackfriday.New(blackfriday.WithExtensions(blackfriday.CommonExtensions))
-	ast := parser.Parse([]byte(post))
+	// NOTE(kanata2): The esa.io system uses CRLF as a newline. So convert to LF for Blackfriday.
+	normalized := strings.NewReplacer("\r\n", "\n").Replace(post)
+	parser := blackfriday.New(blackfriday.WithExtensions(blackfriday.FencedCode))
+	ast := parser.Parse([]byte(normalized))
 	ast.Walk(func(n *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if n.Type != blackfriday.Text {
+		if !hasEsaFreshnessPatrollerInfoString(n) {
 			return blackfriday.GoToNext
 		}
-		text := string(n.Literal)
-		if !strings.HasPrefix(text, "Last checked at") {
-			return blackfriday.GoToNext
-		}
-		words := strings.Split(string(n.Literal), " ")
-		// Last checked at YYYY/MM/DD by @username1, @username2,...
-		// 0    1       2  3          4  5...
-		// <-------------- 5 --------->  <------ 1~ -------------->
-		if len(words) < 6 {
+		var annotation annotation
+		if werr := yaml.Unmarshal(n.Literal, &annotation); werr != nil {
+			err = werr
 			return blackfriday.Terminate
 		}
-		date, perr := time.Parse("2006/01/02", words[3])
-		if perr != nil {
-			err = perr
+		date, werr := time.Parse("2006/01/02", annotation.LastCheckedAt)
+		if werr != nil {
+			err = werr
 			return blackfriday.Terminate
 		}
-		if date.AddDate(0, 0, c.threshold).After(time.Now()) {
+
+		if annotation.Interval == 0 {
+			annotation.Interval = c.threshold
+		}
+		if annotation.Skip || date.AddDate(0, 0, annotation.Interval).After(time.Now()) {
 			return blackfriday.Terminate
 		}
 		mo.LastCheckedAt = date
-		mo.Owners = normalizeOwners(strings.Join(words[5:], ""))
+		mo.Owners = annotation.Owners
 
 		return blackfriday.Terminate
 	})
@@ -60,15 +69,6 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 	return &mo, nil
 }
 
-func normalizeOwners(s string) []string {
-	splitOwners := strings.Split(s, ",")
-	owners := make([]string, 0, len(splitOwners))
-	for i := range splitOwners {
-		normalized := strings.TrimSpace(splitOwners[i])
-		if normalized == "" {
-			continue
-		}
-		owners = append(owners, normalized)
-	}
-	return owners
+func hasEsaFreshnessPatrollerInfoString(n *blackfriday.Node) bool {
+	return n.Type == blackfriday.CodeBlock && strings.HasPrefix(string(n.CodeBlockData.Info), "esa-freshness-patroller")
 }
