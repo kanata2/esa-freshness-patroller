@@ -30,8 +30,10 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 		mo  MaybeOutdated
 		err error
 	)
+	// NOTE(kanata2): The esa.io system uses CRLF as a newline. So convert to LF for Blackfriday.
+	normalized := strings.NewReplacer("\r\n", "\n").Replace(post)
 	parser := blackfriday.New(blackfriday.WithExtensions(blackfriday.FencedCode))
-	ast := parser.Parse([]byte(post))
+	ast := parser.Parse([]byte(normalized))
 	ast.Walk(func(n *blackfriday.Node, entering bool) blackfriday.WalkStatus {
 		if !hasEsaFreshnessPatrollerInfoString(n) {
 			return blackfriday.GoToNext
