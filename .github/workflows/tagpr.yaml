@@ -11,7 +11,7 @@ jobs:
   tagpr:
     runs-on: ubuntu-latest
     outputs:
-      tag: {{ steps.tagpr.outputs.tag }}
+      tag: ${{ steps.tagpr.outputs.tag }}
     steps:
     - uses: actions/checkout@v3
     - id: tagpr
