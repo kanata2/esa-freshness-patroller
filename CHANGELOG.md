@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.1.2](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.1...v0.1.2) - 2022-12-12
+- fix release workflow by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/6
+
 ## [v0.1.1](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.0...v0.1.1) - 2022-12-12
 - fix release workflow by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/4
 
