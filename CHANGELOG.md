@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.1.1](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.0...v0.1.1) - 2022-12-12
+- fix release workflow by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/4
+
 ## [v0.1.0](https://github.com/kanata2/esa-freshness-patroller/compare/v0.0.11...v0.1.0) - 2022-12-12
 - Change format for metadata per post by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/3
 
