@@ -18,11 +18,11 @@ type checker struct {
 }
 
 type annotation struct {
-	Owners        []string          `yaml:"owners"`
-	LastCheckedAt string            `yaml:"last_checked_at"`
-	Interval      int               `yaml:"interval"`
-	Skip          bool              `yaml:"skip"`
-	Custom        map[string]string `yaml:"custom"`
+	Owners            []string          `yaml:"owners"`
+	LastCheckedAt     string            `yaml:"last_checked_at"`
+	CheckIntervalDays int               `yaml:"check_interval_days"`
+	Skip              bool              `yaml:"skip"`
+	Custom            map[string]string `yaml:"custom"`
 }
 
 func (c *checker) Check(post string) (*MaybeOutdated, error) {
@@ -49,10 +49,10 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 			return blackfriday.Terminate
 		}
 
-		if annotation.Interval == 0 {
-			annotation.Interval = c.threshold
+		if annotation.CheckIntervalDays == 0 {
+			annotation.CheckIntervalDays = c.threshold
 		}
-		if annotation.Skip || date.AddDate(0, 0, annotation.Interval).After(time.Now()) {
+		if annotation.Skip || date.AddDate(0, 0, annotation.CheckIntervalDays).After(time.Now()) {
 			return blackfriday.Terminate
 		}
 		mo.LastCheckedAt = date
