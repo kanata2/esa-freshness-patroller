@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.0](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.4...v0.2.0) - 2023-01-17
+- Rename interval by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/10
+
 ## [v0.1.4](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.3...v0.1.4) - 2022-12-12
 
 ## [v0.1.3](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.2...v0.1.3) - 2022-12-12
