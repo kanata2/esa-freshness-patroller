@@ -21,7 +21,7 @@ This must be written in YAML according to the following schema.
 | --- | -------- | ---- | ----------- |
 | `owners` | Yes | Array of string | documentation owner/reviewer |
 | `last_checked_at` | Yes | String(format: `YYYY/MM/DD`) | last reviewed date by owner/reviewers |
-| `check_interval_days` | No | Numbner | day for patrolling interval. this takes precedence over oeverall configuration |
+| `check_interval_days` | No | Number | day for patrolling interval. this takes precedence over oeverall configuration |
 | `skip` | No | Bool | excluding from patrolling targets |
 | `custom` | No | Mapping(key/value is String) | custom metadata that can be added freely |
 
@@ -59,7 +59,7 @@ You can set general configurations through CLI arguments, environment variables 
 | output type | No(default: 'json') | String(json or go-template) | `OUTPUT_TYPE` | `--output` | outputType |
 | Go template file path | No(Yes if output type is go-template) | String | `TEMPLATE` | `--template` | template |
 | destination type | No(default: 'stdout') | String(stdout or esa) | `DESTINATION` | `--destination` | destination |
-| esa's post number for reporting results | No(Yes if destination type is esa) | Number | | esa.reportPostNumber |
+| esa's post number for reporting results | No(Yes if destination type is esa) | Number | | | esa.reportPostNumber |
 | outdated threshold | No | Number | `OUTDATED_THRESHOLD` | `--outdated-threshold` | outdatedThreshold |
 | enable simple text format for annotation | No | Bool | `WITH_SIMPLE_FORMAT` | `--with-simple-format` | withSimpleFormat |
 
