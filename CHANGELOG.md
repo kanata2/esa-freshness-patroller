@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.1](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.0...v0.2.1) - 2023-01-22
+- Revive old annotation style as 'simple text style' by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/12
+
 ## [v0.2.0](https://github.com/kanata2/esa-freshness-patroller/compare/v0.1.4...v0.2.0) - 2023-01-17
 - Rename interval by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/10
 
