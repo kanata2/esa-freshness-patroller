@@ -26,6 +26,12 @@ func WithDebug() PatrollerOptionFn {
 	}
 }
 
+func WithCheckerEnableSimpleAnnotation() PatrollerOptionFn {
+	return func(p *patroller) {
+		p.checker.enableSimplyFormat = true
+	}
+}
+
 func WithCheckerThreshold(day int) PatrollerOptionFn {
 	return func(p *patroller) {
 		p.checker.threshold = day

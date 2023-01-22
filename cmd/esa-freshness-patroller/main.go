@@ -57,7 +57,9 @@ func run(argv []string) error {
 	if cfg.Debug {
 		opts = append(opts, patroller.WithDebug())
 	}
-
+	if cfg.WithSimpleFormat {
+		opts = append(opts, patroller.WithCheckerEnableSimpleAnnotation())
+	}
 	if cfg.OutdatedThreshold > 0 {
 		opts = append(opts, patroller.WithCheckerThreshold(cfg.OutdatedThreshold))
 	}

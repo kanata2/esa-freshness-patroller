@@ -16,6 +16,7 @@ type config struct {
 	Output            string
 	Destination       string
 	OutdatedThreshold int
+	WithSimpleFormat  bool
 	Slack             *slackConfig
 	Email             *emailConfig
 	Esa               *esaConfig
@@ -46,11 +47,13 @@ func New(args []string) (*config, error) {
 	fs.String("config", "", "filepath for configuration yaml")
 	fs.String("template", "", "filepath for template of patrolled result")
 	fs.Int("outdated-threshold", 90, "filepath for template of patrolled result")
+	fs.Bool("with-simple-format", false, "enable simple format")
 	pflag.CommandLine.AddGoFlagSet(fs)
 	pflag.Parse()
 	v.BindPFlags(pflag.CommandLine)
 	// Alias
 	v.BindPFlag("outdatedthreshold", pflag.CommandLine.Lookup("outdated-threshold"))
+	v.BindPFlag("withSimpleFormat", pflag.CommandLine.Lookup("with-simple-format"))
 
 	v.AutomaticEnv()
 
@@ -63,6 +66,7 @@ func New(args []string) (*config, error) {
 		"SLACK_TOKEN":        "slack.token",
 		"SLACK_CHANNEL":      "slack.channel",
 		"ESA_REPORT_POST":    "esa.reportPostNumber",
+		"WITH_SIMPLE_FORMAT": "withSimpleFormat",
 	} {
 		if s := v.GetString(ek); s != "" {
 			v.Set(k, s)
