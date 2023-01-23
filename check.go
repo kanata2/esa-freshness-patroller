@@ -60,6 +60,8 @@ func (c *checker) Check(post string) (*MaybeOutdated, error) {
 		if !c.enableSimplyFormat {
 			return nil, nil
 		}
+		parser := blackfriday.New(blackfriday.WithExtensions(blackfriday.CommonExtensions))
+		ast := parser.Parse([]byte(post))
 		ast.Walk(func(n *blackfriday.Node, entering bool) blackfriday.WalkStatus {
 			if !hasEsaFreshnessPatrollerSimpleAnnotation(n) {
 				return blackfriday.GoToNext
