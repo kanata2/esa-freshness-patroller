@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.2](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.1...v0.2.2) - 2023-01-23
+- fix typo in README by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/14
+- fix parsing error for simple text format by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/16
+
 ## [v0.2.1](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.0...v0.2.1) - 2023-01-22
 - Revive old annotation style as 'simple text style' by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/12
 
