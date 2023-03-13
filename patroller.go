@@ -83,9 +83,10 @@ func (p patroller) Patrol(ctx context.Context) (*Result, error) {
 			mo, err := p.checker.Check(post.BodyMarkdown)
 			if err != nil {
 				result.Warnings = append(result.Warnings, &Warning{
-					Title:  post.Name,
-					URL:    post.URL,
-					Reason: err.Error(),
+					Title:    post.Name,
+					Category: post.Category,
+					URL:      post.URL,
+					Reason:   err.Error(),
 				})
 				continue
 			}
@@ -93,6 +94,7 @@ func (p patroller) Patrol(ctx context.Context) (*Result, error) {
 				continue
 			}
 			mo.Title = post.Name
+			mo.Category = post.Category
 			mo.URL = post.URL
 			result.Items = append(result.Items, mo)
 		}
@@ -111,13 +113,15 @@ type Result struct {
 
 type MaybeOutdated struct {
 	Title         string    `json:"title"`
+	Category      string    `json:"category"`
 	URL           string    `json:"url"`
 	LastCheckedAt time.Time `json:"last_checked_at"`
 	Owners        []string  `json:"owners"`
 }
 
 type Warning struct {
-	Title  string `json:"title"`
-	URL    string `json:"url"`
-	Reason string `json:"reason"`
+	Title    string `json:"title"`
+	Category string `json:"category"`
+	URL      string `json:"url"`
+	Reason   string `json:"reason"`
 }
