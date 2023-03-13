@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.3](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.2...v0.2.3) - 2023-03-13
+- Add category by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/17
+
 ## [v0.2.2](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.1...v0.2.2) - 2023-01-23
 - fix typo in README by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/14
 - fix parsing error for simple text format by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/16
