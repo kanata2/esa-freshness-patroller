@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.2.4](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.3...v0.2.4) - 2023-04-01
+- Upgrade deps by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/19
+
 ## [v0.2.3](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.2...v0.2.3) - 2023-03-13
 - Add category by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/17
 
