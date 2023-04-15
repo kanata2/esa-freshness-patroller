@@ -7,11 +7,11 @@ import (
 	"log"
 	"os"
 
-	patroller "github.com/kanata2/esa-freshness-patroller"
 	"github.com/kanata2/esa-freshness-patroller/internal/config"
 	"github.com/kanata2/esa-freshness-patroller/internal/esa"
 	"github.com/kanata2/esa-freshness-patroller/internal/output"
 	"github.com/kanata2/esa-freshness-patroller/internal/transform"
+	"github.com/kanata2/esa-freshness-patroller/patroller"
 )
 
 func main() {
