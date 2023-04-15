@@ -64,3 +64,9 @@ You can set general configurations through CLI arguments, environment variables 
 | enable simple text format for annotation | No | Bool | `WITH_SIMPLE_FORMAT` | `--with-simple-format` | withSimpleFormat |
 
 Priority: CLI arguments > Environment variables > Config file
+
+## How to use esa-freshness-patroller as Go module
+
+```
+$ go get github.com/kanata2/esa-freshness-patroller/patroller
+```
