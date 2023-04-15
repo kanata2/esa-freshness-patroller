@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"io"
 
-	patroller "github.com/kanata2/esa-freshness-patroller"
+	"github.com/kanata2/esa-freshness-patroller/patroller"
 )
 
 type Transformer interface {
