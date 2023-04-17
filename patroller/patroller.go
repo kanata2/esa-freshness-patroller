@@ -12,7 +12,6 @@ import (
 type patroller struct {
 	debug    bool
 	client   *esa.Client
-	query    string
 	checker  *checker
 	template *template.Template
 	logger   *log.Logger
@@ -38,10 +37,9 @@ func WithCheckerThreshold(day int) PatrollerOptionFn {
 	}
 }
 
-func New(esaApiKey, esaTeam, query string, opts ...PatrollerOptionFn) patroller {
+func New(esaApiKey, esaTeam string, opts ...PatrollerOptionFn) patroller {
 	p := patroller{
 		client:  esa.NewClient(esaTeam, esaApiKey),
-		query:   query,
 		checker: &checker{threshold: 90},
 		logger:  log.Default(),
 	}
@@ -65,13 +63,13 @@ func (p patroller) Warnf(format string, v ...interface{}) {
 	p.logger.Printf("[warn] "+format, v...)
 }
 
-func (p patroller) Patrol(ctx context.Context) (*Result, error) {
+func (p patroller) Patrol(ctx context.Context, query string) (*Result, error) {
 	page := 1
 	result := &Result{}
 	for {
 		resp, err := p.client.ListPosts(
 			ctx,
-			esa.WithListPostsOptionQuery(p.query),
+			esa.WithListPostsOptionQuery(query),
 			esa.WithListPostsOptionPage(page),
 			esa.WithListPostsOptionPerPage(esa.MaxElementsPerPage),
 		)
