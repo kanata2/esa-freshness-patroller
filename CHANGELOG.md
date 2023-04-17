@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.4.0](https://github.com/kanata2/esa-freshness-patroller/compare/v0.3.0...v0.4.0) - 2023-04-17
+- pass `query` in `Patrol` method instead of `New` function by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/24
+
 ## [v0.3.0](https://github.com/kanata2/esa-freshness-patroller/compare/v0.2.4...v0.3.0) - 2023-04-15
 - fix directory structure by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/21
 - Update README by @kanata2 in https://github.com/kanata2/esa-freshness-patroller/pull/23
